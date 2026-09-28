@@ -1,5 +1,4 @@
-import { constants } from 'node:fs';
-import { copyFile, mkdir, readFile, readdir, realpath } from 'node:fs/promises';
+import { readFile, readdir, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from 'csv-parse/sync';
 import { z } from 'zod';
@@ -63,11 +62,11 @@ export class FileRepositories {
     }));
   }
   async ensureMaster(): Promise<void> {
-    const output = path.join(this.root, 'out/sharepoint');
-    await mkdir(output, { recursive: true });
-    try {
-      await copyFile(await this.fixture('maestro-contratos.csv'), path.join(output, 'maestro-contratos.csv'), constants.COPYFILE_EXCL);
-    } catch (error) { if (!(error instanceof Error && 'code' in error && error.code === 'EEXIST')) throw error; }
+    const output = new OutputRepository(this.root);
+    const marker = '__MISSING_MASTER__';
+    if (await output.read('sharepoint/maestro-contratos.csv', marker) === marker) {
+      await output.atomic('sharepoint/maestro-contratos.csv', await readFile(await this.fixture('maestro-contratos.csv'), 'utf8'));
+    }
   }
   async commercials() {
     return commercialSchema.parse(JSON.parse(await readFile(await this.fixture('comerciales.json'), 'utf8')));

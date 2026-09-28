@@ -9,7 +9,7 @@
 
 ## Dictamen
 
-**El reto todavía no está completo al 100% frente al instructivo y al PRD.** Hay implementación local de las cinco herramientas, agente, API, interfaz y demo. Faltan el despliegue público, una conversación real exitosa con el proveedor y el cierre de las diferencias técnicas recogidas en el informe.
+**El reto todavía no está completo al 100% frente al instructivo y al PRD.** Hay implementación local de las cinco herramientas, agente, API, interfaz y demo. Faltan el despliegue público, una conversación real exitosa con el proveedor y la publicación del repositorio. Los ajustes técnicos T01–T04 están corregidos.
 
 El PDF exige código fuente, `demo.ts`, URL pública funcional y `SOLUCION.md`. El PRD permite un ZIP como alternativa al repositorio Git, y acepta defensa local con penalización por falta de despliegue; esa alternativa no equivale a cumplir el enlace público.
 
@@ -32,8 +32,8 @@ El PDF exige código fuente, `demo.ts`, URL pública funcional y `SOLUCION.md`. 
 ## Evidencia resumida
 
 - Typecheck de frontend y backend correcto.
-- 37 pruebas unitarias/de integración pasando.
-- 2 pruebas de navegador pasaron en la comprobación previa, usando proveedor simulado.
+- 40 pruebas unitarias/de integración pasando.
+- 2 pruebas de navegador con proveedor simulado; ver fecha de comprobación en VERIFICACION.md.
 - Demo repetida dos veces en copia temporal: 6/6, sin API key y con la misma salida lógica.
 - Los fixtures se conservan intactos; no se altera el maestro original.
 - Prueba real de conectividad: HTTP 429, `credit_balance_exhausted`; el usuario confirmó que no ha agregado saldo.

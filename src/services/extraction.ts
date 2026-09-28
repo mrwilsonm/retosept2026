@@ -30,17 +30,22 @@ export function extractContract(raw: string): ExtractedContract {
     : /colombia|bogota|medellin|barranquilla/.test(partyContext) ? 'CO' : null;
   const object = text.match(/\bOBJETO\.\s*([^\n]+)/i)?.[1]?.trim() ?? null;
   const amountClause = text.split('\n').find(line => /\bVALOR\b/.test(line)) ?? '';
+  const explicitCodes = [...amountClause.matchAll(/\b([A-Z]{3})\s*\$?\s*\d[\d.,]*/g)]
+    .map(match => match[1]).filter(code => code !== undefined && code !== 'IVA');
+  for (const code of explicitCodes) {
+    if (!currency.safeParse(code).success) throw new Error(`Moneda no admitida: ${code}`);
+  }
   const demand = /no tiene un valor determinado|valor indeterminado|por demanda/.test(fold(amountClause));
   const amount = amountClause.match(/\b(COP|USD|PEN|PAB|HNL)\s*\$?\s*([\d.,]+)/);
   const rawCurrency = amount?.[1] ?? (demand ? text.match(/\b(COP|USD|PEN|PAB|HNL)\b/)?.[1] : undefined);
   const termClause = text.split('\n').find(line => /\bPLAZO\b/.test(line)) ?? '';
-  const from = termClause.match(/desde\s+(.+?)\s+hasta/i)?.[1];
+  const from = termClause.match(/desde\s+(.+?)(?=\s+hasta\b|$)/i)?.[1];
   const until = termClause.match(/hasta\s+([^\n]+)/i)?.[1];
   const start = from ? parseExplicitDate(from) : null;
   let end = until ? parseExplicitDate(until) : null;
-  const months = termClause.match(/\((\d+)\)\s*meses/i)?.[1];
+  const months = termClause.match(/(?:\((\d+)\)|(\d+))\s*meses/i);
   let endConfidence = 1;
-  if (!end && start && months) { end = deriveEndDateFromMonths(start, Number(months)); endConfidence = 0.7; }
+  if (!end && start && months) { end = deriveEndDateFromMonths(start, Number(months[1] ?? months[2])); endConfidence = 0.7; }
   const policyClause = text.split('\n').find(line => /GARANT[IÍ]AS\./i.test(line)) ?? '';
   const policyText = fold(policyClause);
   const policyRequired = policyClause ? !/no (?:se )?(?:requiere|exige)/.test(policyText) : amendment ? null : false;

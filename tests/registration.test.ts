@@ -52,7 +52,8 @@ it('bloquea baja confianza, confianza inflada y confirmación con fechas ausente
   inflated.valor.confianza = 1;
   expect(JSON.parse(await registrar.execute({ mensaje_id: 'msg-006', contrato: inflated }, ctx))).toMatchObject({ ok: false });
   expect(JSON.parse(await registrar.execute({ mensaje_id: 'msg-006', contrato: contract, confirmado: true }, ctx))).toMatchObject({ ok: false });
-  expect(await readdir(path.join(ctx.directory, 'out'))).toEqual(['log.jsonl']);
+  expect(await readdir(path.join(ctx.directory, 'out'))).toEqual(['log.jsonl', 'sharepoint']);
+  expect(await new FileRepositories(ctx.directory).contracts()).toHaveLength(8);
   expect(unwrap(await registrar.execute({ mensaje_id: 'msg-006', contrato: corrected(contract), confirmado: true, hoy: '2026-09-03' }, ctx)))
     .toMatchObject({ accion: 'nuevo', id_contrato: 'CM-2026-03' });
 });
@@ -71,7 +72,10 @@ it('duplicados y cotizaciones no escriben archivos de negocio', async () => {
   const contract = await extract(ctx, 'msg-004');
   expect(unwrap(await registrar.execute({ mensaje_id: 'msg-004', contrato: contract }, ctx))).toMatchObject({ accion: 'duplicado' });
   expect(unwrap(await registrar.execute({ mensaje_id: 'msg-005', contrato: contract }, ctx))).toMatchObject({ accion: 'rechazado' });
-  expect(await readdir(path.join(ctx.directory, 'out'))).toEqual(['log.jsonl']);
+  expect(await readdir(path.join(ctx.directory, 'out'))).toEqual(['log.jsonl', 'sharepoint']);
+  expect(await readFile(path.join(ctx.directory, 'out/sharepoint/maestro-contratos.csv')))
+    .toEqual(await readFile(path.join(ctx.directory, 'fixtures/reto-02/maestro-contratos.csv')));
+  expect(await readdir(path.join(ctx.directory, 'out/sharepoint'))).toEqual(['maestro-contratos.csv']);
 });
 it('genera IDs secuenciales cuando el contrato no trae número', async () => {
   const ctx = await setup();

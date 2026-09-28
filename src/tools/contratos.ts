@@ -19,6 +19,9 @@ function defineTool<S extends z.ZodRawShape>(name: string, description: string, 
       try { response = { ok: true, data: await exclusive(repo.root, async () => {
         const parsed = z.object(args).strict().parse(input);
         await new OutputRepository(repo.root).recover();
+        // RN6: initialize once before the first valid tool execution. Business no-ops
+        // never modify this baseline; output operations are already serialized.
+        await repo.ensureMaster();
         return run(parsed, repo);
       }) }; }
       catch (error) { response = { ok: false, error: error instanceof Error ? error.message : 'Error inesperado' }; }

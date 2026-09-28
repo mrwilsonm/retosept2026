@@ -8,7 +8,7 @@ Implementados: lectura, extracción, validación, registro, archivado, historial
 
 Dockerfile y Compose preparados. Docker no estaba instalado en el equipo de desarrollo, por lo que la imagen está pendiente de ejecución. **URL pública: pendiente de desplegar en un alojamiento elegido por el usuario.**
 
-La auditoría contra el PDF identifica ajustes pendientes de moneda desconocida, plazo en meses e inicialización del maestro. Consulta [el informe de cumplimiento](docs/INFORME_CUMPLIMIENTO.md) y [el índice de entrega](ENTREGA.md). No se declara cierre del 100% del reto.
+La auditoría contra el PDF permitió corregir moneda desconocida, plazo en meses e inicialización del maestro. Consulta [el informe de cumplimiento](docs/INFORME_CUMPLIMIENTO.md) y [el índice de entrega](ENTREGA.md). No se declara cierre del 100% del reto.
 
 ## Ejecutar localmente
 
@@ -27,7 +27,7 @@ Configura `LLM_API_KEY` en `.env`. El modelo inicial es `gpt-4.1-mini`, configur
 npm run build && npm start
 ```
 
-Abre http://localhost:3000. Este comando compila frontend y backend y arranca el servidor; después de editar TypeScript o React vuelve a compilar. Para ejecutar una compilación existente: `npm start`. `npm run dev` utiliza vigilancia de archivos; en este equipo produjo `EMFILE`, por lo que el comando anterior es el validado para la defensa.
+Abre http://localhost:3000. Este comando compila frontend y backend y arranca el servidor; después de editar TypeScript o React vuelve a compilar. Para ejecutar una compilación existente: `npm start`. `npm run dev` también compila y arranca sin vigilancia. La vigilancia queda en `npm run dev:watch`; en este equipo produjo `EMFILE`.
 
 Si la terminal usa Node 15 aunque tengas Node 24 instalado en `/usr/local/bin`, utiliza `PATH=/usr/local/bin:$PATH npm start`.
 

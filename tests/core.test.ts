@@ -64,6 +64,18 @@ describe('Normalización y límites', () => {
   });
 });
 describe('Extracción con evidencia', () => {
+  it('deriva fin con menor confianza cuando hay inicio explícito y plazo sin hasta', async () => {
+    const original = await fixtureText('msg-001');
+    const text = original.replace(/TERCERA\. PLAZO\.[^\n]+/, 'TERCERA. PLAZO. El contrato dura doce (12) meses desde el primero (1) de agosto de 2026.');
+    const contract = extractContract(text);
+    expect(contract.fecha_inicio.valor).toBe('2026-08-01');
+    expect(contract.fecha_fin).toMatchObject({ valor: '2027-08-01', confianza: 0.7 });
+  });
+  it('distingue una moneda no admitida de una moneda ausente', async () => {
+    const text = await fixtureText('msg-001');
+    expect(() => extractContract(text.replace('COP $265.000.000', 'EUR 265.000.000'))).toThrow('Moneda no admitida: EUR');
+    expect(extractContract('CONTRATO sin datos').moneda.valor).toBeNull();
+  });
   it('extrae el cliente extranjero y no el país del contratista', async () => {
     const contract = extractContract(await fixtureText('msg-002'));
     expect(contract.pais.valor).toBe('EC');
@@ -118,6 +130,14 @@ describe('Reglas de negocio', () => {
   });
 });
 describe('Herramientas y repositorios', () => {
+  it('reporta moneda no admitida y permite procesar el siguiente correo', async () => {
+    const ctx = await workspace();
+    const file = path.join(ctx.directory, 'fixtures/reto-02/buzon/msg-001/contrato.txt');
+    await writeFile(file, (await readFile(file, 'utf8')).replace('COP $265.000.000', 'EUR 265.000.000'));
+    expect(JSON.parse(await extraer.execute({ mensaje_id: 'msg-001' }, ctx)))
+      .toMatchObject({ ok: false, error: expect.stringContaining('Moneda no admitida: EUR') });
+    expect(JSON.parse(await extraer.execute({ mensaje_id: 'msg-002' }, ctx))).toMatchObject({ ok: true });
+  });
   it('aísla correos y adjuntos dañados para no abortar el lote', async () => {
     const ctx = await workspace();
     await writeFile(path.join(ctx.directory, 'fixtures/reto-02/buzon/msg-001/correo.json'), '{inválido');
@@ -147,7 +167,9 @@ describe('Herramientas y repositorios', () => {
     expect(await checksum(path.join(ctx.directory, 'fixtures'))).toBe(before);
     const log = await readFile(path.join(ctx.directory, 'out/log.jsonl'), 'utf8');
     expect(log.trim().split('\n')).toHaveLength(12);
-    expect(await readdir(path.join(ctx.directory, 'out'))).toEqual(['log.jsonl']);
+    expect(await readdir(path.join(ctx.directory, 'out'))).toEqual(['log.jsonl', 'sharepoint']);
+    expect(await readFile(path.join(ctx.directory, 'out/sharepoint/maestro-contratos.csv')))
+      .toEqual(await readFile(path.join(ctx.directory, 'fixtures/reto-02/maestro-contratos.csv')));
   });
   it('excluye procesados y copia el maestro sin sobrescribirlo', async () => {
     const ctx = await workspace();

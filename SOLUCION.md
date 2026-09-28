@@ -82,16 +82,16 @@ Zod es el contrato runtime; csv-parse evita errores de CSV; Fastify expone API; 
 | Historia | Estado | Evidencia / límite |
 |---|---|---|
 | HU-1 | Hecho | Pendientes, adjuntos y errores aislados de correos |
-| HU-2 | Parcial | Fixtures cubiertos; falta corregir extracción de inicio explícito más meses sin «hasta» |
+| HU-2 | Verificado localmente | Fixtures y plazo por meses sin «hasta»; fin derivado con confianza 0.7 |
 | HU-3 | Hecho | Seis clasificaciones, diferencias y comercial |
 | HU-4 | Hecho | Validación, confirmación, archivo, historial, procesados y reintentos |
 | HU-5 | Hecho | Alertas por fecha explícita y corte inclusivo |
-| HU-6 | Parcial | Errores, timeout y aislamiento probados; moneda desconocida retorna éxito con null y debe retornar error según PRD |
+| HU-6 | Verificado localmente | Moneda explícita no admitida retorna error; siguiente correo sigue procesándose |
 | Agente real | Bloqueado por saldo | Clave configurada; prueba real HTTP 429 credit_balance_exhausted |
 | Frontend/API | Implementado | Compilación, pruebas API y pruebas de navegador |
 | Docker | Configuración preparada | No ejecutado: Docker no está instalado en esta máquina |
 | URL pública | Pendiente | Falta plataforma y despliegue real |
-| RN6 | Parcial | Fixture intacto; el maestro de salida se materializa al registrar, no en primera lectura |
+| RN6 | Verificado localmente | Copia atómica al ejecutar la primera herramienta válida; no sobrescribe el maestro existente |
 | Código para entrega | ZIP disponible | Git local inicializado; destino mrwilsonm/retosept2026; publicación pendiente de autenticación |
 
 Las pruebas usan directorios temporales y comprueban escrituras, bloqueo, confirmación, reintentos concurrentes, herencia del otrosí, límites de ejecución y contrato HTTP. La demo ejecuta seis casos completos sin API key. La entrega no se considera desplegada ni validada contra OpenAI hasta completar esas comprobaciones externas. La auditoría adicional, sus reproducciones y las decisiones pendientes están en [INFORME_CUMPLIMIENTO.md](docs/INFORME_CUMPLIMIENTO.md).

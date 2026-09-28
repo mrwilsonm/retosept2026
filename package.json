@@ -9,7 +9,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit && tsc -p web/tsconfig.json",
     "build": "tsc && vite build web --config web/vite.config.ts",
-    "dev": "npm run build && node --watch dist/src/server.js",
+    "dev": "npm run build && node dist/src/server.js",
+    "dev:watch": "npm run build && node --watch dist/src/server.js",
     "start": "node dist/src/server.js",
     "test": "vitest run",
     "test:watch": "vitest",
