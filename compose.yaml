@@ -1,0 +1,14 @@
+services:
+  contratos:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      HOST: 0.0.0.0
+    volumes:
+      - contratos-data:/app/out
+    restart: unless-stopped
+volumes:
+  contratos-data:
